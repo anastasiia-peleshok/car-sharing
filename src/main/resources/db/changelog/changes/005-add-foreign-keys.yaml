@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-add-foreign-keys
+      author: anastasiia-peleshok
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: rentals
+            baseColumnNames: user_id
+            constraintName: fk_rentals_user
+            referencedTableName: users
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: rentals
+            baseColumnNames: car_id
+            constraintName: fk_rentals_car
+            referencedTableName: cars
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: rentals
+            baseColumnNames: payment_id
+            constraintName: fk_rentals_payment
+            referencedTableName: payments
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: payments
+            baseColumnNames: rental_id
+            constraintName: fk_payments_rental
+            referencedTableName: rentals
+            referencedColumnNames: id
