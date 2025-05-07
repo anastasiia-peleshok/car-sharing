@@ -41,7 +41,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: role
-                  type: enum ('customer','manager')
+                  type: enum ('CUSTOMER','MANAGER')
                   constraints:
                     nullable: false
               - column:

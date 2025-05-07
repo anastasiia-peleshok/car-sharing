@@ -5,17 +5,13 @@ import com.example.carsharing.dto.user.UserRegistrationRequestDto;
 import com.example.carsharing.dto.user.UserUpdateRequestDto;
 import com.example.carsharing.model.User;
 import com.example.carsharing.config.MapperConfig;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 @Mapper(config = MapperConfig.class)
 public interface UserMapper {
     UserDto toDto(User user);
 
     User toModel(UserRegistrationRequestDto requestDto);
-
     User toModel(UserUpdateRequestDto requestDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

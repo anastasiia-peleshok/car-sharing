@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthenticationController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
+
+    public AuthenticationController(UserService userService, AuthenticationService authenticationService) {
+        this.userService = userService;
+        this.authenticationService = authenticationService;
+    }
 
     @Operation(summary = "Register user", description = "Create an account")
     @PostMapping("/registration")

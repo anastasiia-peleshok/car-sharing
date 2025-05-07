@@ -18,6 +18,9 @@ public record UserRegistrationRequestDto(
         @Email
         String email,
         @NotNull
+        @Length(min = 2, max = 255)
+        String phone,
+        @NotNull
         @Length(min = 8, max = 255)
         String password,
         @NotNull
