@@ -24,7 +24,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: car_type
-                  type:  enum ('auto','manual')
+                  type:  enum ('AUTO','MANUAL')
                   constraints:
                     nullable: false
               - column:
@@ -38,7 +38,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: is_availiable
+                  name: is_available
                   type: boolean
                   constraints:
                     nullable: false

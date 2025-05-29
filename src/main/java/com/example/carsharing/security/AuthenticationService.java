@@ -2,7 +2,6 @@ package com.example.carsharing.security;
 
 import com.example.carsharing.dto.user.UserLoginRequestDto;
 import com.example.carsharing.dto.user.UserLoginResponseDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

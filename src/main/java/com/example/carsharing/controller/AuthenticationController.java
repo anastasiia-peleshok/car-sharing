@@ -7,7 +7,6 @@ import com.example.carsharing.dto.user.UserRegistrationRequestDto;
 import com.example.carsharing.security.AuthenticationService;
 import com.example.carsharing.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

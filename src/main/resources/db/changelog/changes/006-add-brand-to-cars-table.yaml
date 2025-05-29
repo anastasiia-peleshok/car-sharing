@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-brand-to-cars-table
+      author: anastasiia-peleshok
+      changes:
+        - addColumn:
+            tableName: cars
+            columns:
+              - column:
+                  name: brand
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false

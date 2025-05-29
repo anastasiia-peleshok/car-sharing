@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-brand-to-cars-table
+      author: anastasiia-peleshok
+      changes:
+        - addColumn:
+            tableName: rentals
+            columns:
+              - column:
+                  name: actual_rental_end
+                  type: DATETIME
+                  constraints:
+                    nullable: true

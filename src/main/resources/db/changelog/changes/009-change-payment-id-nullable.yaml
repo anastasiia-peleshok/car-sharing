@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-change-payment-id-nullable
+      author: anastasiia-peleshok
+      changes:
+        - dropNotNullConstraint:
+            tableName: rentals
+            columnName: payment_id
+            columnDataType: BINARY(16)

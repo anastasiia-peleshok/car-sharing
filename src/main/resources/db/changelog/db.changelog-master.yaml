@@ -9,3 +9,13 @@ databaseChangeLog:
       file: db/changelog/changes/004-create-payments-table.yaml
   - include:
       file: db/changelog/changes/005-add-foreign-keys.yaml
+  - include:
+      file: db/changelog/changes/006-add-brand-to-cars-table.yaml
+  - include:
+      file: db/changelog/changes/007-add-actual_rental_end-to-rentals-table.yaml
+  - include:
+      file: db/changelog/changes/008-change-datetime-to-date.yaml
+  - include:
+      file: db/changelog/changes/009-change-payment-id-nullable.yaml
+  - include:
+      file: db/changelog/changes/010-add-payed-time-to-payments.yaml

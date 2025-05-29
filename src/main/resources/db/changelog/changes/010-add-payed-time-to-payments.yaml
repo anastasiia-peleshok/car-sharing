@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-add-payed-time-to-payments
+      author: anastasiia-peleshok
+      changes:
+        - addColumn:
+            tableName: payments
+            columns:
+              - column:
+                  name: payment_time
+                  type: DATETIME
+                  constraints:
+                    nullable: true

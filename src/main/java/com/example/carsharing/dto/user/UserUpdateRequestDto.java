@@ -13,6 +13,8 @@ public record UserUpdateRequestDto(
         @Email
         @Length(min = 2, max = 255)
         String email,
+        @Length(min = 2, max = 255)
+        String phone,
         @Length(min = 8, max = 255)
         String password,
         @Length(min = 8, max = 255)

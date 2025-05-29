@@ -19,7 +19,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: status
-                  type:  enum ('paid','unpaid')
+                  type:  enum ('PAID','UNPAID')
                   constraints:
                     nullable: false
               - column:
