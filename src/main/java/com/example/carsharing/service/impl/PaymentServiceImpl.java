@@ -30,7 +30,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
     private final WayForPayService wayForPayService;
-    private final RentalService rentalService;
 
 
     @Override
@@ -44,10 +43,6 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentMapper.toModel(paymentRequestDto);
         payment.setUser(user);
         payment.setRental(rental);
-        // TODO: remove from here and add to the controller. Payment should be created with amount set
-        // Love you
-        payment.setAmount(rentalService.getAmountToPay(rental.getId()));
-
         Payment savedPayment = paymentRepository.save(payment);
 
         String paymentLink;

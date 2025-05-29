@@ -59,7 +59,6 @@ class PaymentServiceTest {
 
         when(rentalRepository.findById(testRental.getId())).thenReturn(Optional.of(testRental));
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
-        when(rentalService.getAmountToPay(testRental.getId())).thenReturn(BigDecimal.valueOf(100.00));
         when(paymentRepository.save(any(Payment.class))).thenReturn(testPayment);
         when(wayForPayService.createLink(any(Payment.class))).thenReturn("http://payment.link");
         when(paymentMapper.toModel(requestDto)).thenReturn(testPayment);
@@ -107,7 +106,6 @@ class PaymentServiceTest {
         when(rentalRepository.findById(testRental.getId())).thenReturn(Optional.of(testRental));
         when(userRepository.findById(testUser.getId())).thenReturn(Optional.of(testUser));
         when(paymentMapper.toModel(requestDto)).thenReturn(testPayment);
-        when(rentalService.getAmountToPay(testRental.getId())).thenReturn(BigDecimal.valueOf(100));
         when(paymentRepository.save(any())).thenReturn(testPayment);
         when(wayForPayService.createLink(any())).thenThrow(new RuntimeException("WayForPay error"));
 

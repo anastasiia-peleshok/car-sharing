@@ -155,17 +155,11 @@ public class RentalServiceTest {
                 RentalSupplier.getRentalWithDetailedCarInfoDtoWithId4();
 
         when(rentalRepository.findById(rentalId)).thenReturn(Optional.of(rental));
-        when(rentalRepository.save(rental)).thenReturn(rental);
-        when(rentalMapper.toWithDetailedCarInfoDto(rental)).thenReturn(expected);
 
-        PaymentResponseDto actual = rentalService.completeRental(rentalId);
+        rentalService.completeRental(rentalId);
 
-        assertNotNull(actual);
-        assertEquals(expected, actual);
         verify(carService, times(1)).returnRentedCar(rental.getCar().getId());
         verify(rentalRepository, times(1)).findById(rentalId);
-        verify(rentalRepository, times(1)).save(rental);
-        verify(rentalMapper, times(1)).toWithDetailedCarInfoDto(rental);
         verifyNoMoreInteractions(rentalRepository, rentalMapper, carService);
     }
 

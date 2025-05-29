@@ -74,7 +74,7 @@ public class UserSeviceTest {
                 () -> userService.save(requestDto)
         );
 
-        String expected = "User with email " + email + " is already exist.";
+        String expected = "A user with email " + email + " already exists.";
         String actual = exception.getMessage();
 
         assertNotNull(actual);
@@ -158,7 +158,7 @@ public class UserSeviceTest {
                 () -> userService.updateUser(user.getId(), requestDto)
         );
 
-        String expected = "User with email " + email + " is already exist.";
+        String expected = "A user with email " + email + " already exists.";
         String actual = exception.getMessage();
 
         assertNotNull(actual);

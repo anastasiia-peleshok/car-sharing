@@ -35,7 +35,6 @@ public class RentalServiceImpl implements RentalService {
     private final CarRepository carRepository;
     private final CarService carService;
     private final RentalMapper rentalMapper;
-    private final PaymentService paymentService;
 
     private static final BigDecimal RENTAL_FINE_PER_DAY = BigDecimal.valueOf(2);
 
@@ -73,7 +72,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     @Transactional
-    public PaymentResponseDto completeRental(UUID rentalId) {
+    public void completeRental(UUID rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
 
@@ -83,10 +82,8 @@ public class RentalServiceImpl implements RentalService {
         LocalDate now = LocalDate.now();
         rental.setReturned(true);
         rental.setActualRentalEnd(now);
-        carService.returnRentedCar(rental.getCar().getId());
 
-        PaymentCreationRequestDto paymentCreationRequestDto = new PaymentCreationRequestDto(rental.getUser().getId(), rental.getCar().getId());
-        return paymentService.createPayment(paymentCreationRequestDto);
+        carService.returnRentedCar(rental.getCar().getId());
     }
 
     @Override

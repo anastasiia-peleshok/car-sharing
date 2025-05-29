@@ -41,8 +41,8 @@ public class RentalController {
     @Operation(summary = "Return rented car", description = "Mark the rental as returned by updating the actual return date")
     @PostMapping("/return/{rentalId}")
     @ResponseStatus(HttpStatus.OK)
-    public PaymentResponseDto returnRental(@PathVariable UUID rentalId) {
-        return rentalService.completeRental(rentalId);
+    public void returnRental(@PathVariable UUID rentalId) {
+        rentalService.completeRental(rentalId);
     }
 
     /**

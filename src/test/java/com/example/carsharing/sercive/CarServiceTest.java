@@ -58,7 +58,7 @@ public class CarServiceTest {
         CarDto expected = CarSupplier.getCarDto();
 
         when(carRepository.findById(carId)).thenReturn(Optional.of(car));
-        //when(carMapper.toDto(car)).thenReturn(expected);
+        when(carMapper.toDto(car)).thenReturn(expected);
 
         CarDto actual = carService.getCarById(carId);
 
@@ -101,7 +101,7 @@ public class CarServiceTest {
                 () -> carService.rentCar(car.getId())
         );
 
-        String expected = "There no available cars with id: " + car.getId() + " at the moment";
+        String expected = "No available car with id: "+ car.getId();
         String actual = exception.getMessage();
 
         assertEquals(expected, actual);

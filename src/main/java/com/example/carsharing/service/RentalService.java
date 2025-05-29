@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface RentalService {
     RentalWithDetailedCarInfoDto save(RentalCreationRequestDto requestDto, UUID userId);
 
-    PaymentResponseDto completeRental(UUID id);
+    void completeRental(UUID id);
 
     List<RentalDto> findAllByUser(UUID userId);
 
