@@ -1,6 +1,5 @@
 package com.example.carsharing.service;
 
-import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;

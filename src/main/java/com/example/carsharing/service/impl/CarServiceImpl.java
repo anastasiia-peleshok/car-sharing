@@ -100,7 +100,7 @@ public class CarServiceImpl implements CarService {
         Car car = getCarOrThrow(id);
         car.setUpdatedAt(LocalDate.now());
         car.setDeletedAt(LocalDate.now());
-        carRepository.deleteById(id); // Optional: consider soft delete instead
+        carRepository.deleteById(id);
     }
 
     private Car getCarOrThrow(UUID id) {

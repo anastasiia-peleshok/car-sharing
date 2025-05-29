@@ -13,9 +13,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FieldMatch {
     String message() default "Fields must match each other";
+
     String first();
+
     String second();
 
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,7 +1,6 @@
 package com.example.carsharing.dto.car;
 
 import com.example.carsharing.model.CarType;
-import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;

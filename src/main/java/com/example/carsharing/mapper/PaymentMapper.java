@@ -3,7 +3,6 @@ package com.example.carsharing.mapper;
 import com.example.carsharing.config.MapperConfig;
 import com.example.carsharing.dto.payment.PaymentCreationRequestDto;
 import com.example.carsharing.dto.payment.PaymentResponseDto;
-import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.model.Payment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

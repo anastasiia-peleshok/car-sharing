@@ -1,6 +1,5 @@
 package com.example.carsharing.controller;
 
-import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
@@ -75,6 +74,7 @@ public class RentalController {
     public List<RentalDto> getAllRentalsByUser(@PathVariable UUID userId) {
         return rentalService.findAllByUser(userId);
     }
+
     /**
      * Get all overdue rentals. Accessible to MANAGER only.
      */

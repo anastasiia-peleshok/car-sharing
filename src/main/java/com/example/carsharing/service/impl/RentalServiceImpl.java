@@ -1,7 +1,5 @@
 package com.example.carsharing.service.impl;
 
-import com.example.carsharing.dto.payment.PaymentCreationRequestDto;
-import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
@@ -15,7 +13,6 @@ import com.example.carsharing.repository.CarRepository;
 import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.CarService;
-import com.example.carsharing.service.PaymentService;
 import com.example.carsharing.service.RentalService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +73,7 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
 
-        if(rental.isReturned()){
+        if (rental.isReturned()) {
             throw new RentalIsNotActiveException("Rental is already returned");
         }
         LocalDate now = LocalDate.now();

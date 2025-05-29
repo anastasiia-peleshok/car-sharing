@@ -20,7 +20,7 @@ public class PaymentSupplier {
         user.setDeleted(false);
         user.setCreatedAt(LocalDate.now());
         user.setUpdatedAt(LocalDate.now());
-        user.setDeletedAt(null); // optional, can leave as null
+        user.setDeletedAt(null);
         return user;
     }
 

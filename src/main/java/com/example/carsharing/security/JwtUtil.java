@@ -21,7 +21,6 @@ public class JwtUtil {
     public JwtUtil(@Value("${jwt.secret}") String secretString,
                    @Value("${jwt.expiration}") Long expirationMillis) {
         this.expiration = expirationMillis;
-      //  byte[] keyBytes = Base64.getDecoder().decode(secretString);
         this.secret = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
     }
 

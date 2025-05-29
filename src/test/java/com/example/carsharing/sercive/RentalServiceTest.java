@@ -212,7 +212,7 @@ public class RentalServiceTest {
     void getAmountToPay_ReturnedRental_CalculatesByActualRentalEnd() {
         UUID rentalId = UUID.randomUUID();
         LocalDate start = LocalDate.of(2025, 5, 1);
-        LocalDate actualEnd = LocalDate.of(2025, 5, 5); // 4 days
+        LocalDate actualEnd = LocalDate.of(2025, 5, 5);
         BigDecimal pricePerDay = new BigDecimal("100");
 
         Car car = new Car();
@@ -221,7 +221,7 @@ public class RentalServiceTest {
         Rental rental = new Rental();
         rental.setId(rentalId);
         rental.setRentalStart(start);
-        rental.setRentalEnd(start.plusDays(10)); // irrelevant
+        rental.setRentalEnd(start.plusDays(10));
         rental.setActualRentalEnd(actualEnd);
         rental.setCar(car);
 
@@ -237,7 +237,7 @@ public class RentalServiceTest {
     void getAmountToPay_OngoingRental_CalculatesBaseAmount() {
         UUID rentalId = UUID.randomUUID();
         LocalDate start = LocalDate.now().minusDays(2);
-        LocalDate end = LocalDate.now().plusDays(3); // not overdue
+        LocalDate end = LocalDate.now().plusDays(3);
         BigDecimal pricePerDay = new BigDecimal("80");
 
         Car car = new Car();
@@ -263,7 +263,7 @@ public class RentalServiceTest {
     void getAmountToPay_OverdueRental_AddsPenalty() {
         UUID rentalId = UUID.randomUUID();
         LocalDate start = LocalDate.now().minusDays(10);
-        LocalDate end = LocalDate.now().minusDays(5); // overdue by 5 days
+        LocalDate end = LocalDate.now().minusDays(5);
         BigDecimal pricePerDay = new BigDecimal("70");
 
         Car car = new Car();
