@@ -43,7 +43,7 @@ public class UserSeviceTest {
         User user = UserSupplier.getUser();
         UserDto expected = UserSupplier.getUserDto();
 
-        when(userRepository.findByEmail(requestDto.email())).thenReturn(Optional.empty());
+        when(userRepository.findUserByEmail(requestDto.email())).thenReturn(Optional.empty());
         when(userMapper.toModel(requestDto)).thenReturn(user);
         when(passwordEncoder.encode(any(String.class))).thenReturn(user.getPassword());
         when(userRepository.save(user)).thenReturn(user);
@@ -53,13 +53,14 @@ public class UserSeviceTest {
 
         assertNotNull(actual);
         assertEquals(expected, actual);
-        verify(userRepository, times(1)).findByEmail(requestDto.email());
+        verify(userRepository, times(1)).findUserByEmail(requestDto.email());
         verify(userMapper, times(1)).toModel(requestDto);
         verify(passwordEncoder, times(1)).encode(any(String.class));
         verify(userRepository, times(1)).save(user);
         verify(userMapper, times(1)).toDto(user);
         verifyNoMoreInteractions(userRepository, userMapper, passwordEncoder);
     }
+
     @Test
     @DisplayName("Verify save() method throws exception when email is already taken")
     public void save_EmailTaken_ThrowsException() {
@@ -67,7 +68,7 @@ public class UserSeviceTest {
         User user = UserSupplier.getUser();
         String email = user.getEmail();
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
 
         RegistrationException exception = assertThrows(
                 RegistrationException.class,
@@ -79,7 +80,7 @@ public class UserSeviceTest {
 
         assertNotNull(actual);
         assertEquals(expected, actual);
-        verify(userRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findUserByEmail(email);
         verifyNoMoreInteractions(userRepository, userMapper, passwordEncoder);
     }
 
@@ -151,7 +152,7 @@ public class UserSeviceTest {
         String email = requestDto.email();
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
 
         RegistrationException exception = assertThrows(
                 RegistrationException.class,
@@ -163,7 +164,7 @@ public class UserSeviceTest {
 
         assertNotNull(actual);
         assertEquals(expected, actual);
-        verify(userRepository, times(1)).findByEmail(email);
+        verify(userRepository, times(1)).findUserByEmail(email);
         verifyNoMoreInteractions(userRepository, userMapper);
     }
 }

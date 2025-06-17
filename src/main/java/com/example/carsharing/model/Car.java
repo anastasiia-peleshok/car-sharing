@@ -2,15 +2,14 @@ package com.example.carsharing.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
 @Data
 @Entity
@@ -18,15 +17,9 @@ import java.util.UUID;
 @SQLDelete(sql = "UPDATE cars SET is_deleted = TRUE WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
-public class Car {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id;
+@ToString(exclude = {"rentals", "features"})
+@EqualsAndHashCode(callSuper = true, exclude = {"rentals", "features"})
+public class Car extends BaseEntity {
     @Column(nullable = false)
     private String brand;
     @Column(nullable = false)
@@ -40,19 +33,17 @@ public class Car {
     private int year;
     @Column(nullable = false)
     private BigDecimal price;
-    @Column(nullable = false,  columnDefinition = "TINYINT(1)")
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private boolean isAvailable;
 
-    @OneToMany(mappedBy = "car")
-    private List<Rental> rentalList;
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
+    private Set<Rental> rentals;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
-    @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
-    @Column(name = "deleted_at")
-    private LocalDate deletedAt;
-    @Column(name = "is_deleted",  columnDefinition = "TINYINT(1)",  nullable = false)
-    private boolean isDeleted;
-
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "car_feature",
+            joinColumns = @JoinColumn(name = "car_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id")
+    )
+    private Set<Feature> features;
 }

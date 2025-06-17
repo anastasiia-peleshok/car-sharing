@@ -1,8 +1,6 @@
 package com.example.carsharing.controller;
 
-import com.example.carsharing.dto.car.CarDto;
-import com.example.carsharing.dto.car.CarRegistrationRequestDto;
-import com.example.carsharing.dto.car.CarUpdateRequestDto;
+import com.example.carsharing.dto.car.*;
 import com.example.carsharing.dto.filter.FilterDto;
 import com.example.carsharing.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,12 +37,58 @@ public class CarController {
     }
 
     /**
+     * Add feature into car.
+     */
+    @Operation(summary = "Add feature to car", description = "Add")
+    @PostMapping("/{carId}/{featureId}")
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public CarDto addFeatureToCar(@PathVariable UUID carId, @PathVariable UUID featureId ) {
+        return carService.setNewFeatureToCar(carId, featureId);
+    }
+
+    /**
      * Get a specific car by its ID.
      */
     @Operation(summary = "Get car by ID", description = "Retrieve a specific car by its UUID")
     @GetMapping("/{carId}")
     public CarDto getCarById(@PathVariable UUID carId) {
         return carService.getCarById(carId);
+    }
+
+    /**
+     * Get a specific car by its ID with features.
+     */
+    @Operation(summary = "Get car by ID with features", description = "Retrieve a specific car by its UUID")
+    @GetMapping("/{carId}/features")
+    public CarDtoWithFeatures getCarWithFeatures(@PathVariable UUID carId) {
+        return carService.getByIdWithFeatures(carId);
+    }
+
+    /**
+     * Get a specific car by its ID with details.
+     */
+    @Operation(summary = "Get car by ID with details", description = "Retrieve a specific car by its UUID")
+    @GetMapping("/{carId}/details")
+    public FullCarDto getCarWithAllRelations(@PathVariable UUID carId) {
+        return carService.getCarByIdWithRelations(carId);
+    }
+
+    /**
+     * Get all cars that is currently available.
+     */
+    @Operation(summary = "Get all currently available cars", description = "Retrieve available cars")
+    @GetMapping("/available")
+    public List<CarDto> getAllAvailableCars() {
+        return carService.getAvailableCars();
+    }
+
+    /**
+     * Get all cars that are available for date range with filters.
+     */
+    @Operation(summary = "Get all available cars by filter", description = "Retrieve available cars")
+    @PostMapping("/available")
+    public List<CarDto> getAllAvailableCarsByRangeAndFilter(@RequestBody FilterCarDto filterCarDto) {
+        return carService.getCarsByRangeAndFilter(filterCarDto);
     }
 
     /**

@@ -1,13 +1,14 @@
 package com.example.carsharing.dto.rental;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record RentalDto(
         UUID id,
         UUID userId,
         UUID carId,
-        LocalDate rentalStart,
-        LocalDate rentalEnd,
-        LocalDate actualReturnDate) {
+        LocalDateTime rentalStart,
+        LocalDateTime rentalEnd,
+        LocalDateTime actualReturnDate,
+        boolean isReturned) {
 }

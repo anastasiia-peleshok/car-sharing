@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -47,36 +48,31 @@ public class RentalServiceImpl implements RentalService {
 
         carService.rentCar(carId);
 
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         Rental rental = rentalMapper.toModel(requestDto);
         rental.setUser(user);
         rental.setCar(car);
-        rental.setCreatedAt(now);
-        rental.setUpdatedAt(now);
         rental.setRentalStart(now);
 
         Rental savedRental = rentalRepository.save(rental);
-        user.getRentalList().add(savedRental);
+        user.getRentals().add(savedRental);
         return rentalMapper.toWithDetailedCarInfoDto(savedRental);
     }
 
     @Override
     public List<RentalDto> findAllByUser(UUID userId) {
-        return rentalRepository.findAllByUserId(userId).stream()
-                .map(rentalMapper::toDto)
-                .toList();
+        return rentalRepository.findAllByUserId(userId).stream().map(rentalMapper::toDto).toList();
     }
 
     @Override
     @Transactional
     public void completeRental(UUID rentalId) {
-        Rental rental = rentalRepository.findById(rentalId)
-                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
+        Rental rental = getRental(rentalId);
 
         if (rental.isReturned()) {
             throw new RentalIsNotActiveException("Rental is already returned");
         }
-        LocalDate now = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
         rental.setReturned(true);
         rental.setActualRentalEnd(now);
 
@@ -85,9 +81,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public RentalWithDetailedCarInfoDto findById(UUID id) {
-        return rentalRepository.findById(id)
-                .map(rentalMapper::toWithDetailedCarInfoDto)
-                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + id));
+        return rentalMapper.toWithDetailedCarInfoDto(getRental(id));
     }
 
     @Override
@@ -100,12 +94,11 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public BigDecimal getAmountToPay(UUID rentalId) {
-        Rental rental = rentalRepository.findById(rentalId)
-                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
+        Rental rental = getRental(rentalId);
 
-        LocalDate rentalStart = rental.getRentalStart();
-        LocalDate rentalEnd = rental.getRentalEnd();
-        LocalDate now = LocalDate.now();
+        LocalDateTime rentalStart = rental.getRentalStart();
+        LocalDateTime rentalEnd = rental.getRentalEnd();
+        LocalDateTime now = LocalDateTime.now();
         BigDecimal dailyRate = rental.getCar().getPrice();
 
         if (rental.getActualRentalEnd() != null) {
@@ -124,5 +117,10 @@ public class RentalServiceImpl implements RentalService {
         BigDecimal penalty = RENTAL_FINE_PER_DAY.multiply(BigDecimal.valueOf(overdueDays));
 
         return baseAmount.add(penalty);
+    }
+
+    private Rental getRental(UUID rentalId) {
+        return rentalRepository.findById(rentalId)
+                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
     }
 }

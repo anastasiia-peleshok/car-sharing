@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-update-timestamps-for_rental
+      author: anastasiia-peleshok
+      changes:
+        - modifyDataType:
+            tableName: rentals
+            columnName: rental_start
+            newDataType: DATETIME(6)
+        - modifyDataType:
+            tableName: rentals
+            columnName: rental_end
+            newDataType: DATETIME(6)

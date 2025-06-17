@@ -11,7 +11,9 @@ import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
-    @Query("SELECT p FROM Payment p WHERE p.status = :status")
+    @Query("SELECT p FROM Payment p " +
+            "WHERE p.status = :status " +
+            "AND p.isDeleted=false")
     List<Payment> findByStatus(@Param("status") Status status);
 
 }

@@ -6,7 +6,7 @@ import com.example.carsharing.model.Status;
 import com.example.carsharing.model.User;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class PaymentSupplier {
@@ -18,8 +18,8 @@ public class PaymentSupplier {
         user.setLastName("Doe");
         user.setEmail("john@example.com");
         user.setDeleted(false);
-        user.setCreatedAt(LocalDate.now());
-        user.setUpdatedAt(LocalDate.now());
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
         user.setDeletedAt(null);
         return user;
     }
@@ -27,7 +27,7 @@ public class PaymentSupplier {
     public static Rental rental() {
         Rental rental = new Rental();
         rental.setId(UUID.randomUUID());
-        rental.setRentalStart(LocalDate.now());
+        rental.setRentalStart(LocalDateTime.now());
         return rental;
     }
 
@@ -38,8 +38,8 @@ public class PaymentSupplier {
         payment.setStatus(Status.UNPAID);
         payment.setUser(user());
         payment.setRental(rental());
-        payment.setCreatedAt(LocalDate.now());
-        payment.setUpdatedAt(LocalDate.now());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setUpdatedAt(LocalDateTime.now());
         payment.setDeleted(false);
         return payment;
     }

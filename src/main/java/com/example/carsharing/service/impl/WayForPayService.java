@@ -15,7 +15,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,10 +135,10 @@ public class WayForPayService {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("transactionType", "CHECK_STATUS");
         payload.put("merchantAccount", merchantAccount);
-        payload.put("orderReference", paymentId.toString());
+        payload.put("orderReference", paymentId);
         payload.put("apiVersion", 1);
 
-        String signature = generateHistorySignature(paymentId.toString());
+        String signature = generateHistorySignature(paymentId);
         payload.put("merchantSignature", signature);
 
         HttpRequest request = HttpRequest.newBuilder()

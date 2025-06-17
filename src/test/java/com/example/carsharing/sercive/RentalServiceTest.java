@@ -1,6 +1,5 @@
 package com.example.carsharing.sercive;
 
-import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
 import com.example.carsharing.exceptions.EntityNotFoundException;
@@ -25,9 +24,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,7 +58,7 @@ public class RentalServiceTest {
                 RentalSupplier.getRentalWithDetailedCarInfoDtoWithId4();
         Rental rental = RentalSupplier.getRental();
         User user = UserSupplier.getUser();
-        user.setRentalList(new ArrayList<>());
+        user.setRentals(new HashSet<>());
         Car car = CarSupplier.getCar();
 
         when(carRepository.findById(car.getId())).thenReturn(Optional.of(car));
@@ -149,13 +148,9 @@ public class RentalServiceTest {
     @DisplayName("Verify returnRental() method works")
     public void returnRental_ValidId_ReturnsRentalDto() {
         UUID rentalId = UUID.fromString("abc2b2a9-53dc-4bc8-824f-64448bb463d4");
-        ;
         Rental rental = RentalSupplier.getRental();
-        RentalWithDetailedCarInfoDto expected =
-                RentalSupplier.getRentalWithDetailedCarInfoDtoWithId4();
 
         when(rentalRepository.findById(rentalId)).thenReturn(Optional.of(rental));
-
         rentalService.completeRental(rentalId);
 
         verify(carService, times(1)).returnRentedCar(rental.getCar().getId());
@@ -189,7 +184,7 @@ public class RentalServiceTest {
         UUID rentalId = UUID.fromString("abc2b2a9-53dc-4bc8-824f-64448bb463d4");
 
         Rental rental = RentalSupplier.getRental();
-        rental.setActualRentalEnd(LocalDate.now());
+        rental.setActualRentalEnd(LocalDateTime.now());
         rental.setReturned(true);
 
         when(rentalRepository.findById(rentalId)).thenReturn(Optional.of(rental));
@@ -211,8 +206,8 @@ public class RentalServiceTest {
     @DisplayName("Should calculate amount based on actualRentalEnd when rental is returned")
     void getAmountToPay_ReturnedRental_CalculatesByActualRentalEnd() {
         UUID rentalId = UUID.randomUUID();
-        LocalDate start = LocalDate.of(2025, 5, 1);
-        LocalDate actualEnd = LocalDate.of(2025, 5, 5);
+        LocalDateTime start = LocalDateTime.of(2025, 5, 1, 15, 15);
+        LocalDateTime actualEnd = LocalDateTime.of(2025, 5, 5, 15, 15);
         BigDecimal pricePerDay = new BigDecimal("100");
 
         Car car = new Car();
@@ -232,12 +227,13 @@ public class RentalServiceTest {
 
         assertEquals(expected, actual);
     }
+
     @Test
     @DisplayName("Should calculate amount based on rental period if rental is ongoing and not overdue")
     void getAmountToPay_OngoingRental_CalculatesBaseAmount() {
         UUID rentalId = UUID.randomUUID();
-        LocalDate start = LocalDate.now().minusDays(2);
-        LocalDate end = LocalDate.now().plusDays(3);
+        LocalDateTime start = LocalDateTime.now().minusDays(2);
+        LocalDateTime end = LocalDateTime.now().plusDays(3);
         BigDecimal pricePerDay = new BigDecimal("80");
 
         Car car = new Car();
@@ -258,12 +254,13 @@ public class RentalServiceTest {
 
         assertEquals(expected, actual);
     }
+
     @Test
     @DisplayName("Should calculate base amount + fine if rental is overdue and not returned")
     void getAmountToPay_OverdueRental_AddsPenalty() {
         UUID rentalId = UUID.randomUUID();
-        LocalDate start = LocalDate.now().minusDays(10);
-        LocalDate end = LocalDate.now().minusDays(5);
+        LocalDateTime start = LocalDateTime.now().minusDays(10);
+        LocalDateTime end = LocalDateTime.now().minusDays(5);
         BigDecimal pricePerDay = new BigDecimal("70");
 
         Car car = new Car();
@@ -279,7 +276,7 @@ public class RentalServiceTest {
         when(rentalRepository.findById(rentalId)).thenReturn(Optional.of(rental));
 
         long plannedDays = ChronoUnit.DAYS.between(start, end);
-        long overdueDays = ChronoUnit.DAYS.between(end, LocalDate.now());
+        long overdueDays = ChronoUnit.DAYS.between(end, LocalDateTime.now());
 
         BigDecimal base = pricePerDay.multiply(BigDecimal.valueOf(plannedDays));
         BigDecimal fine = RENTAL_FINE_PER_DAY.multiply(BigDecimal.valueOf(overdueDays));

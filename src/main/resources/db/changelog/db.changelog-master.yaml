@@ -19,3 +19,12 @@ databaseChangeLog:
       file: db/changelog/changes/009-change-payment-id-nullable.yaml
   - include:
       file: db/changelog/changes/010-add-payed-time-to-payments.yaml
+  - include:
+      file: db/changelog/changes/011-update-timestamps-precision.yaml
+  - include:
+      file: db/changelog/changes/012-update-timestamps-for-rental.yaml
+  - include:
+      file: db/changelog/changes/013-update-timestamps-for-actual-rental-end.yaml
+  - include:
+      file: db/changelog/changes/014-create-features-table.yaml
+

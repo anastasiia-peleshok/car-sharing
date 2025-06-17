@@ -2,18 +2,18 @@ package com.example.carsharing.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
 @Data
 @Entity
@@ -21,15 +21,9 @@ import java.util.UUID;
 @SQLDelete(sql = "UPDATE users SET is_deleted = TRUE WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
-public class User implements UserDetails {
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id;
+@ToString(exclude = "rentals")
+@EqualsAndHashCode(callSuper = true,exclude = "rentals")
+public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
@@ -45,17 +39,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private List<Rental> rentalList;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Rental> rentals;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
-    @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
-    @Column(name = "deleted_at")
-    private LocalDate deletedAt;
-    @Column(name = "is_deleted",  columnDefinition = "TINYINT(1)", nullable = false)
-    private boolean isDeleted;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -92,7 +78,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 
     public enum Role {

@@ -46,8 +46,6 @@ class PaymentServiceTest {
     private WayForPayService wayForPayService;
     @Mock
     private PaymentMapper paymentMapper;
-    @Mock
-    private RentalService rentalService;
 
     @Test
     void testCreatePayment_Success() throws Exception {

@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-create-car-feature-table
+      author: anastasiia-peleshok
+      changes:
+        - createTable:
+            tableName: car_feature
+            columns:
+              - column:
+                  name: id
+                  type: BINARY(16)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feature_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: car_feature
+            baseColumnNames: car_id
+            constraintName: fk_car_feature_car
+            referencedTableName: cars
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: car_feature
+            baseColumnNames: feature_id
+            constraintName: fk_car_feature_feature
+            referencedTableName: features
+            referencedColumnNames: id
+            onDelete: CASCADE

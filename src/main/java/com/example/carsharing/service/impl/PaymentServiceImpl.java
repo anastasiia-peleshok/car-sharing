@@ -12,7 +12,6 @@ import com.example.carsharing.repository.PaymentRepository;
 import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.PaymentService;
-import com.example.carsharing.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -93,7 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
     public void checkPendingPayments() {
         List<Payment> pending = paymentRepository.findByStatus(Status.UNPAID);
         for (Payment payment : pending) {
-            boolean paid = false;
+            boolean paid;
             try {
                 paid = wayForPayService.checkStatus(payment.getId().toString());
             } catch (Exception e) {
