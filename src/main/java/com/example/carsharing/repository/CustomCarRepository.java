@@ -2,9 +2,9 @@ package com.example.carsharing.repository;
 
 import com.example.carsharing.dto.car.FilterCarDto;
 import com.example.carsharing.model.Car;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CustomCarRepository {
-    List<Car> findByFilterAndDateRange(FilterCarDto filterCarDto);
+    Page<Car> findByFilterAndDateRange(FilterCarDto filterCarDto, Pageable pageable);
 }

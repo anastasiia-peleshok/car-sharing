@@ -14,19 +14,21 @@ import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.CarService;
 import com.example.carsharing.service.RentalService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RentalServiceImpl implements RentalService {
     private final RentalRepository rentalRepository;
     private final UserRepository userRepository;
@@ -37,7 +39,6 @@ public class RentalServiceImpl implements RentalService {
     private static final BigDecimal RENTAL_FINE_PER_DAY = BigDecimal.valueOf(2);
 
     @Override
-    @Transactional
     public RentalWithDetailedCarInfoDto save(RentalCreationRequestDto requestDto, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("There is no user with id: " + userId));
@@ -60,12 +61,13 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<RentalDto> findAllByUser(UUID userId) {
-        return rentalRepository.findAllByUserId(userId).stream().map(rentalMapper::toDto).toList();
+    @Transactional(readOnly = true)
+    public Page<RentalDto> findAllByUser(UUID userId, Pageable pageable) {
+        return rentalRepository.findAllByUserId(userId, pageable)
+                .map(rentalMapper::toDto);
     }
 
     @Override
-    @Transactional
     public void completeRental(UUID rentalId) {
         Rental rental = getRental(rentalId);
 
@@ -80,19 +82,21 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RentalWithDetailedCarInfoDto findById(UUID id) {
         return rentalMapper.toWithDetailedCarInfoDto(getRental(id));
     }
 
     @Override
-    public List<RentalWithDetailedCarInfoDto> checkOverdueRentals() {
+    @Transactional(readOnly = true)
+    public Page<RentalWithDetailedCarInfoDto> checkOverdueRentals(Pageable  pageable) {
         LocalDate today = LocalDate.now();
-        return rentalRepository.findAllOverdues(today).stream()
-                .map(rentalMapper::toWithDetailedCarInfoDto)
-                .toList();
+        return rentalRepository.findAllOverdues(today, pageable)
+                .map(rentalMapper::toWithDetailedCarInfoDto);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal getAmountToPay(UUID rentalId) {
         Rental rental = getRental(rentalId);
 

@@ -6,13 +6,14 @@ import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
 import com.example.carsharing.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -71,8 +72,8 @@ public class RentalController {
     @Operation(summary = "Get all rentals by user", description = "Retrieve all rentals for a specific user.")
     @GetMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<RentalDto> getAllRentalsByUser(@PathVariable UUID userId) {
-        return rentalService.findAllByUser(userId);
+    public Page<RentalDto> getAllRentalsByUser(@PathVariable UUID userId, Pageable pageable) {
+        return rentalService.findAllByUser(userId, pageable);
     }
 
     /**
@@ -82,7 +83,7 @@ public class RentalController {
     @PreAuthorize("hasAuthority('MANAGER')")
     @GetMapping("/overdue")
     @ResponseStatus(HttpStatus.OK)
-    public List<RentalWithDetailedCarInfoDto> getOverdueRentals() {
-        return rentalService.checkOverdueRentals();
+    public Page<RentalWithDetailedCarInfoDto> getOverdueRentals(Pageable  pageable) {
+        return rentalService.checkOverdueRentals(pageable);
     }
 }

@@ -12,11 +12,13 @@ import com.example.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -33,11 +35,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(UUID id) {
         return userMapper.toDto(getUser(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserByEmail(String email) {
         return userRepository.findUserByEmail(email)
                 .map(userMapper::toDto)
@@ -51,7 +55,7 @@ public class UserServiceImpl implements UserService {
             ensureEmailIsAvailable(userDto.email());
         }
         userMapper.updateUserFromDto(userDto, userToUpdate);
-        return userMapper.toDto(userRepository.save(userToUpdate));
+        return userMapper.toDto(userToUpdate);
     }
 
     private User getUser(UUID userToUpdateId) {
@@ -63,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateRole(UUID userToUpdateId, User.Role role) {
         User userToUpdate = getUser(userToUpdateId);
         userToUpdate.setRole(role);
-        return userMapper.toDto(userRepository.save(userToUpdate));
+        return userMapper.toDto(userToUpdate);
     }
 
     @Override

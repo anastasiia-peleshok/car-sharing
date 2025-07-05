@@ -4,10 +4,11 @@ import com.example.carsharing.dto.feature.FeatureDto;
 import com.example.carsharing.service.FeatureService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,8 +23,8 @@ public class FeatureController {
     @Operation(summary = "Get all features", description = "Retrieve a list of all available features.")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<FeatureDto> getFeatures() {
-        return featureService.getFeatures();
+    public Page<FeatureDto> getFeatures(Pageable pageable) {
+        return featureService.getFeatures(pageable);
     }
 
     /**

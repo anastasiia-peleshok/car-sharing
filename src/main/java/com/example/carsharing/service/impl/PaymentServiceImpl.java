@@ -13,16 +13,18 @@ import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final PaymentRepository paymentRepository;
@@ -63,12 +65,14 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
-    public List<PaymentResponseDto> getAllPayments() {
-        return paymentRepository.findAll().stream()
-                .map(paymentMapper::toDto).collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<PaymentResponseDto> getAllPayments(Pageable pageable) {
+        return paymentRepository.findAll(pageable)
+                .map(paymentMapper::toDto);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaymentResponseDto getPaymentById(UUID id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no payments with id: " + id));
@@ -88,7 +92,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Scheduled(fixedRate = 3000)
+    @Transactional(readOnly = true)
+    //@Scheduled(fixedRate = 3000)
     public void checkPendingPayments() {
         List<Payment> pending = paymentRepository.findByStatus(Status.UNPAID);
         for (Payment payment : pending) {
@@ -101,7 +106,6 @@ public class PaymentServiceImpl implements PaymentService {
             if (paid) {
                 payment.setStatus(Status.PAID);
                 payment.setPaymentTime(LocalDateTime.now());
-                paymentRepository.save(payment);
             }
         }
     }

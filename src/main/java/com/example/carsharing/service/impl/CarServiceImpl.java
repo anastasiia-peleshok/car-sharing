@@ -13,16 +13,18 @@ import com.example.carsharing.repository.FeatureRepository;
 import com.example.carsharing.service.CarService;
 import com.example.carsharing.specification.CarSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CarServiceImpl implements CarService {
     private final FeatureRepository featureRepository;
     private final CarRepository carRepository;
@@ -36,35 +38,35 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CarDto getCarById(UUID id) {
         return carMapper.toDto(carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no car with id: " + id)));
     }
 
     @Override
-    public List<CarDto> getAllCars() {
-        return carRepository.findAll().stream()
-                .map(carMapper::toDto)
-                .toList();
+    @Transactional(readOnly = true)
+    public Page<CarDto> getAllCars(Pageable pageable) {
+        return carRepository.findAll(pageable).map(carMapper::toDto);
     }
 
     @Override
-    public List<CarDto> getAvailableCars() {
-        return carRepository.findAllByIsAvailable(true).stream()
-                .map(carMapper::toDto)
-                .toList();
+    @Transactional(readOnly = true)
+    public Page<CarDto> getAvailableCars(Pageable pageable) {
+        return carRepository.findAllByIsAvailable(true, pageable)
+                .map(carMapper::toDto);
     }
 
     @Override
-    public List<CarDto> getCarsByFilter(List<FilterDto> filters) {
+    @Transactional(readOnly = true)
+    public Page<CarDto> getCarsByFilter(List<FilterDto> filters, Pageable pageable) {
         filters.forEach(filter -> {
             if ("type".equals(filter.getColumnName())) {
                 filter.setColumnValue(CarType.valueOf((String) filter.getColumnValue()));
             }
         });
-        return carRepository.findAll(CarSpecification.columnEqual(filters)).stream()
-                .map(carMapper::toDto)
-                .toList();
+        return carRepository.findAll(CarSpecification.columnEqual(filters), pageable)
+                .map(carMapper::toDto);
     }
 
     @Override
@@ -74,21 +76,19 @@ public class CarServiceImpl implements CarService {
             throw new NoAvailableCarsException("No available car with id: " + id);
         }
         car.setAvailable(false);
-        carRepository.save(car);
     }
 
     @Override
     public void returnRentedCar(UUID id) {
         Car car = getCarOrThrow(id);
         car.setAvailable(true);
-        carRepository.save(car);
     }
 
     @Override
     public CarDto updateCar(UUID id, CarUpdateRequestDto updateRequestDto) {
         Car car = getCarOrThrow(id);
         carMapper.updateCarFromDto(updateRequestDto, car);
-        return carMapper.toDto(carRepository.save(car));
+        return carMapper.toDto(car);
     }
 
     @Override
@@ -102,10 +102,10 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarDto setNewFeatureToCar(UUID carId, UUID featureId) {
         Feature feature = featureRepository.findById(featureId).orElseThrow(() -> new EntityNotFoundException("There is no feature with id: " + featureId));
-        Car car = getCarOrThrow(carId);
+        Car car = carRepository.findByIdWithFeatures(carId).orElseThrow(() -> new EntityNotFoundException("There is no car with id: " + featureId));
 
         car.getFeatures().add(feature);
-        return carMapper.toDto(carRepository.save(car));
+        return carMapper.toDto(car);
     }
 
     @Override
@@ -120,17 +120,17 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional(readOnly = true)
     public FullCarDto getCarByIdWithRelations(UUID id) {
-        Car car = carRepository.findByIdWithAllRelations(id)
+        Car car = carRepository.findByIdWithFeatures(id)
                 .orElseThrow(() -> new EntityNotFoundException("There is no car with id: " + id));
-
+         carRepository.findByIdWithRentals(id);
         return carMapper.toFullCarDto(car);
     }
 
     @Override
-    public List<CarDto> getCarsByRangeAndFilter(FilterCarDto filterCarDto) {
-        return carRepository.findByFilterAndDateRange(filterCarDto).stream()
-                .map(carMapper::toDto)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<CarDto> getCarsByRangeAndFilter(FilterCarDto filterCarDto, Pageable pageable) {
+        return carRepository.findByFilterAndDateRange(filterCarDto, pageable)
+                .map(carMapper::toDto);
     }
 
     private Car getCarOrThrow(UUID id) {

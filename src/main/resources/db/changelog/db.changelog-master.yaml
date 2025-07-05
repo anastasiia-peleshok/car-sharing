@@ -27,4 +27,5 @@ databaseChangeLog:
       file: db/changelog/changes/013-update-timestamps-for-actual-rental-end.yaml
   - include:
       file: db/changelog/changes/014-create-features-table.yaml
-
+  - include:
+      file: db/changelog/changes/016-fix-car-feature-table.yaml

@@ -11,6 +11,6 @@ public record RentalCreationRequestDto(
         @Positive
         UUID carId,
         @Future
-        @JsonFormat(pattern = "yyyy-MM-dd")
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime rentalEnd) {
 }

@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-fix-car-feature-table
+      author: anastasiia-peleshok
+      changes:
+        - createTable:
+            tableName: car_feature_temp
+            columns:
+              - column:
+                  name: car_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feature_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: >
+              INSERT INTO car_feature_temp (car_id, feature_id)
+              SELECT DISTINCT car_id, feature_id FROM car_feature;
+        - dropTable:
+            tableName: car_feature
+        - createTable:
+            tableName: car_feature
+            columns:
+              - column:
+                  name: car_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feature_id
+                  type: BINARY(16)
+                  constraints:
+                    nullable: false
+            constraints:
+              primaryKey:
+                primaryKeyName: pk_car_feature
+                columnNames: car_id, feature_id
+        - addForeignKeyConstraint:
+            baseTableName: car_feature
+            baseColumnNames: car_id
+            constraintName: fk_car_feature_car
+            referencedTableName: cars
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: car_feature
+            baseColumnNames: feature_id
+            constraintName: fk_car_feature_feature
+            referencedTableName: features
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - sql:
+            sql: >
+              INSERT INTO car_feature (car_id, feature_id)
+              SELECT car_id, feature_id FROM car_feature_temp;
+        - dropTable:
+            tableName: car_feature_temp

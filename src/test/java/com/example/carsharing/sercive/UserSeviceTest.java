@@ -130,16 +130,15 @@ public class UserSeviceTest {
         User user = UserSupplier.getUserAlice();
         UserDto expected = UserSupplier.getAliceUserDto();
 
-        when(userRepository.save(user)).thenReturn(user);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(expected);
+        when(userMapper.toDto(any(User.class))).thenReturn(expected);
+
 
         UserDto actual = userService.updateUser(user.getId(), requestDto);
 
         assertNotNull(actual);
         assertEquals(expected, actual);
         verify(userMapper, times(1)).updateUserFromDto(requestDto, user);
-        verify(userRepository, times(1)).save(user);
         verify(userMapper, times(1)).toDto(user);
         verifyNoMoreInteractions(userRepository, userMapper);
     }

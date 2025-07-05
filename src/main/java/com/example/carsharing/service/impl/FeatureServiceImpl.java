@@ -7,29 +7,32 @@ import com.example.carsharing.model.Feature;
 import com.example.carsharing.repository.FeatureRepository;
 import com.example.carsharing.service.FeatureService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FeatureServiceImpl implements FeatureService {
     private final FeatureRepository featureRepository;
     private final FeatureMapper featureMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public FeatureDto getFeatureById(UUID id) {
         Feature feature = getFeature(id);
         return featureMapper.toDto(feature);
     }
 
     @Override
-    public List<FeatureDto> getFeatures() {
-        return featureRepository.findAll().stream()
-                .map(featureMapper::toDto)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<FeatureDto> getFeatures(Pageable pageable) {
+        return featureRepository.findAll(pageable)
+                .map(featureMapper::toDto);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class FeatureServiceImpl implements FeatureService {
     public FeatureDto updateFeature(UUID id, FeatureDto featureDto) {
         Feature feature = getFeature(id);
         featureMapper.updateFeatureFromDto(featureDto, feature);
-        return featureMapper.toDto(featureRepository.save(feature));
+        return featureMapper.toDto(feature);
     }
 
     @Override

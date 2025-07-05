@@ -5,6 +5,8 @@ import com.example.carsharing.dto.filter.FilterDto;
 import com.example.carsharing.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,8 @@ public class CarController {
      */
     @Operation(summary = "Get all cars", description = "Retrieve all cars from database")
     @GetMapping
-    public List<CarDto> getAllCars() {
-        return carService.getAllCars();
+    public Page<CarDto> getAllCars(Pageable pageable) {
+        return carService.getAllCars(pageable);
     }
 
     /**
@@ -32,8 +34,8 @@ public class CarController {
      */
     @Operation(summary = "Get cars by filter", description = "Retrieve all cars from database by filter criteria")
     @GetMapping("/filter")
-    public List<CarDto> getAllCarsByFilter(@RequestBody List<FilterDto> filters) {
-        return carService.getCarsByFilter(filters);
+    public Page<CarDto> getAllCarsByFilter(@RequestBody List<FilterDto> filters, Pageable pageable) {
+        return carService.getCarsByFilter(filters, pageable);
     }
 
     /**
@@ -44,6 +46,7 @@ public class CarController {
     @PreAuthorize("hasAuthority('MANAGER')")
     public CarDto addFeatureToCar(@PathVariable UUID carId, @PathVariable UUID featureId ) {
         return carService.setNewFeatureToCar(carId, featureId);
+
     }
 
     /**
@@ -78,8 +81,8 @@ public class CarController {
      */
     @Operation(summary = "Get all currently available cars", description = "Retrieve available cars")
     @GetMapping("/available")
-    public List<CarDto> getAllAvailableCars() {
-        return carService.getAvailableCars();
+    public Page<CarDto> getAllAvailableCars(Pageable pageable) {
+        return carService.getAvailableCars(pageable);
     }
 
     /**
@@ -87,8 +90,8 @@ public class CarController {
      */
     @Operation(summary = "Get all available cars by filter", description = "Retrieve available cars")
     @PostMapping("/available")
-    public List<CarDto> getAllAvailableCarsByRangeAndFilter(@RequestBody FilterCarDto filterCarDto) {
-        return carService.getCarsByRangeAndFilter(filterCarDto);
+    public Page<CarDto> getAllAvailableCarsByRangeAndFilter(@RequestBody FilterCarDto filterCarDto, Pageable pageable) {
+        return carService.getCarsByRangeAndFilter(filterCarDto, pageable);
     }
 
     /**

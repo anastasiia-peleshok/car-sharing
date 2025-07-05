@@ -1,14 +1,15 @@
 package com.example.carsharing.service;
 
 import com.example.carsharing.dto.feature.FeatureDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface FeatureService {
     FeatureDto getFeatureById(UUID id);
 
-    List<FeatureDto> getFeatures();
+    Page<FeatureDto> getFeatures(Pageable pageable);
 
     FeatureDto saveFeature(FeatureDto featureDto);
 

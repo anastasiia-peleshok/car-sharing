@@ -3,9 +3,10 @@ package com.example.carsharing.service;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 public interface RentalService {
@@ -13,11 +14,11 @@ public interface RentalService {
 
     void completeRental(UUID id);
 
-    List<RentalDto> findAllByUser(UUID userId);
+    Page<RentalDto> findAllByUser(UUID userId, Pageable pageable);
 
     RentalWithDetailedCarInfoDto findById(UUID id);
 
-    List<RentalWithDetailedCarInfoDto> checkOverdueRentals();
+    Page<RentalWithDetailedCarInfoDto> checkOverdueRentals(Pageable pageable);
 
     BigDecimal getAmountToPay(UUID rentalId);
 }

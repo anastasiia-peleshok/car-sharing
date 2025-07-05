@@ -5,10 +5,11 @@ import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,8 +34,8 @@ public class PaymentController {
     @Operation(summary = "Get all payments", description = "Retrieve a list of all payments.")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<PaymentResponseDto> getAllPayments() {
-        return paymentService.getAllPayments();
+    public Page<PaymentResponseDto> getAllPayments(Pageable pageable) {
+        return paymentService.getAllPayments(pageable);
     }
 
     /**

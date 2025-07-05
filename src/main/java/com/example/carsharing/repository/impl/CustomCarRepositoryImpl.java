@@ -7,7 +7,11 @@ import com.example.carsharing.model.Rental;
 import com.example.carsharing.repository.CustomCarRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -22,7 +26,7 @@ public class CustomCarRepositoryImpl implements CustomCarRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<Car> findByFilterAndDateRange(FilterCarDto filter) {
+    public Page<Car> findByFilterAndDateRange(FilterCarDto filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Car> cq = cb.createQuery(Car.class);
         Root<Car> car = cq.from(Car.class);
@@ -33,29 +37,23 @@ public class CustomCarRepositoryImpl implements CustomCarRepository {
         if (filter.brands() != null && !filter.brands().isEmpty()) {
             predicates.add(car.get("brand").in(filter.brands()));
         }
-
         if (filter.models() != null && !filter.models().isEmpty()) {
             predicates.add(car.get("model").in(filter.models()));
         }
-
         if (filter.colors() != null && !filter.colors().isEmpty()) {
             predicates.add(car.get("color").in(filter.colors()));
         }
-
         if (filter.carTypes() != null && !filter.carTypes().isEmpty()) {
             predicates.add(car.get("carType").in(filter.carTypes()));
         }
-
         if (filter.years() != null && !filter.years().isEmpty()) {
             predicates.add(car.get("year").in(filter.years()));
         }
-
         if (filter.priceRange() != null && filter.priceRange().size() == 2) {
             BigDecimal minPrice = filter.priceRange().get(0);
             BigDecimal maxPrice = filter.priceRange().get(1);
             predicates.add(cb.between(car.get("price"), minPrice, maxPrice));
         }
-
         if (filter.startDate() != null && filter.endDate() != null) {
             Subquery<UUID> subquery = cq.subquery(UUID.class);
             Root<Rental> rental = subquery.from(Rental.class);
@@ -66,7 +64,6 @@ public class CustomCarRepositoryImpl implements CustomCarRepository {
                     ));
             predicates.add(cb.not(car.get("id").in(subquery)));
         }
-
         if (filter.features() != null && !filter.features().isEmpty()) {
             Join<Car, Feature> featureJoin = car.join("features", JoinType.INNER);
             predicates.add(featureJoin.get("name").in(filter.features()));
@@ -75,7 +72,49 @@ public class CustomCarRepositoryImpl implements CustomCarRepository {
         }
 
         cq.where(predicates.toArray(new Predicate[0]));
-        return entityManager.createQuery(cq).getResultList();
-    }
 
+        TypedQuery<Car> query = entityManager.createQuery(cq);
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+        List<Car> cars = query.getResultList();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Car> countRoot = countQuery.from(Car.class);
+        countQuery.select(cb.countDistinct(countRoot));
+        List<Predicate> countPredicates = new ArrayList<>();
+        if (filter.brands() != null && !filter.brands().isEmpty()) {
+            countPredicates.add(countRoot.get("brand").in(filter.brands()));
+        }
+        if (filter.models() != null && !filter.models().isEmpty()) {
+            countPredicates.add(countRoot.get("model").in(filter.models()));
+        }
+        if (filter.colors() != null && !filter.colors().isEmpty()) {
+            countPredicates.add(countRoot.get("color").in(filter.colors()));
+        }
+        if (filter.carTypes() != null && !filter.carTypes().isEmpty()) {
+            countPredicates.add(countRoot.get("carType").in(filter.carTypes()));
+        }
+        if (filter.years() != null && !filter.years().isEmpty()) {
+            countPredicates.add(countRoot.get("year").in(filter.years()));
+        }
+        if (filter.priceRange() != null && filter.priceRange().size() == 2) {
+            BigDecimal minPrice = filter.priceRange().get(0);
+            BigDecimal maxPrice = filter.priceRange().get(1);
+            countPredicates.add(cb.between(countRoot.get("price"), minPrice, maxPrice));
+        }
+        if (filter.startDate() != null && filter.endDate() != null) {
+            Subquery<UUID> subquery = countQuery.subquery(UUID.class);
+            Root<Rental> rental = subquery.from(Rental.class);
+            subquery.select(rental.get("car").get("id"))
+                    .where(cb.and(
+                            cb.lessThan(rental.get("rentalStart"), filter.endDate()),
+                            cb.greaterThan(rental.get("rentalEnd"), filter.startDate())
+                    ));
+            countPredicates.add(cb.not(countRoot.get("id").in(subquery)));
+        }
+        countQuery.where(countPredicates.toArray(new Predicate[0]));
+        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        return new PageImpl<>(cars, pageable, total);
+    }
 }
