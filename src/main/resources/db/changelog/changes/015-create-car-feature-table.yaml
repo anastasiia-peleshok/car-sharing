@@ -1,7 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: 014-create-car-feature-table
+      id: 015-create-car-feature-table
       author: anastasiia-peleshok
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: car_feature
       changes:
         - createTable:
             tableName: car_feature

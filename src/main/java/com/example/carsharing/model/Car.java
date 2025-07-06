@@ -1,14 +1,12 @@
 package com.example.carsharing.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -37,7 +35,8 @@ public class Car extends BaseEntity {
     private boolean isAvailable;
 
     @OneToMany(mappedBy = "car", fetch = FetchType.LAZY)
-    private Set<Rental> rentals;
+    @Setter(AccessLevel.PRIVATE)
+    private Set<Rental> rentals = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -45,5 +44,6 @@ public class Car extends BaseEntity {
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "feature_id")
     )
-    private Set<Feature> features;
+    @Setter(AccessLevel.PRIVATE)
+    private Set<Feature> features =  new HashSet<>();
 }

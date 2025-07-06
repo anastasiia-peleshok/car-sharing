@@ -2,24 +2,21 @@ databaseChangeLog:
   - changeSet:
       id: 016-fix-car-feature-table
       author: anastasiia-peleshok
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: car_feature
       changes:
-        - createTable:
-            tableName: car_feature_temp
-            columns:
-              - column:
-                  name: car_id
-                  type: BINARY(16)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: feature_id
-                  type: BINARY(16)
-                  constraints:
-                    nullable: false
+        - sql:
+            sql: >
+              CREATE TABLE IF NOT EXISTS car_feature_temp (
+                car_id BINARY(16) NOT NULL,
+                feature_id BINARY(16) NOT NULL
+              )
         - sql:
             sql: >
               INSERT INTO car_feature_temp (car_id, feature_id)
-              SELECT DISTINCT car_id, feature_id FROM car_feature;
+              SELECT DISTINCT car_id, feature_id FROM car_feature
         - dropTable:
             tableName: car_feature
         - createTable:
@@ -56,6 +53,6 @@ databaseChangeLog:
         - sql:
             sql: >
               INSERT INTO car_feature (car_id, feature_id)
-              SELECT car_id, feature_id FROM car_feature_temp;
-        - dropTable:
-            tableName: car_feature_temp
+              SELECT car_id, feature_id FROM car_feature_temp
+        - sql:
+            sql: DROP TABLE IF EXISTS car_feature_temp

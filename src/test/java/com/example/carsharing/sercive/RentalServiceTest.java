@@ -58,7 +58,6 @@ public class RentalServiceTest {
                 RentalSupplier.getRentalWithDetailedCarInfoDtoWithId4();
         Rental rental = RentalSupplier.getRental();
         User user = UserSupplier.getUser();
-        user.setRentals(new HashSet<>());
         Car car = CarSupplier.getCar();
 
         when(carRepository.findById(car.getId())).thenReturn(Optional.of(car));
