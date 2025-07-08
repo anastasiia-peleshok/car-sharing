@@ -93,8 +93,6 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public void deleteCar(UUID id) {
-        Car car = getCarOrThrow(id);
-        car.setDeletedAt(LocalDateTime.now());
         carRepository.deleteById(id);
     }
 

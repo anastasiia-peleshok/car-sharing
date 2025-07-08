@@ -6,9 +6,12 @@ import com.example.carsharing.dto.user.UserUpdateRequestDto;
 import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.exceptions.RegistrationException;
 import com.example.carsharing.mapper.UserMapper;
+import com.example.carsharing.model.Notification;
 import com.example.carsharing.model.User;
 import com.example.carsharing.repository.UserRepository;
+import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.impl.UserServiceImpl;
+import com.example.carsharing.supplier.NotificationSupplier;
 import com.example.carsharing.supplier.UserSupplier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,8 @@ public class UserSeviceTest {
     private UserMapper userMapper;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private NotificationService notificationService;
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -42,7 +47,7 @@ public class UserSeviceTest {
         UserRegistrationRequestDto requestDto = UserSupplier.getUserRegistrationRequestDto();
         User user = UserSupplier.getUser();
         UserDto expected = UserSupplier.getUserDto();
-
+        Notification notification = NotificationSupplier.getNotification();
         when(userRepository.findUserByEmail(requestDto.email())).thenReturn(Optional.empty());
         when(userMapper.toModel(requestDto)).thenReturn(user);
         when(passwordEncoder.encode(any(String.class))).thenReturn(user.getPassword());

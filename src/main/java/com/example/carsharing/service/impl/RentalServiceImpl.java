@@ -7,12 +7,14 @@ import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.exceptions.RentalIsNotActiveException;
 import com.example.carsharing.mapper.RentalMapper;
 import com.example.carsharing.model.Car;
+import com.example.carsharing.model.NotificationSubject;
 import com.example.carsharing.model.Rental;
 import com.example.carsharing.model.User;
 import com.example.carsharing.repository.CarRepository;
 import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.CarService;
+import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,7 @@ public class RentalServiceImpl implements RentalService {
     private final CarRepository carRepository;
     private final CarService carService;
     private final RentalMapper rentalMapper;
+    private final NotificationService notificationService;
 
     private static final BigDecimal RENTAL_FINE_PER_DAY = BigDecimal.valueOf(2);
 
@@ -57,6 +60,11 @@ public class RentalServiceImpl implements RentalService {
 
         Rental savedRental = rentalRepository.save(rental);
         user.getRentals().add(savedRental);
+        notificationService.sendNotification(
+                user,
+                NotificationSubject.BOOKING_CONFIRMED.toString(),
+                "Your booking for car " + car.getBrand() + " " + car.getModel() + " is confirmed."
+        );
         return rentalMapper.toWithDetailedCarInfoDto(savedRental);
     }
 
@@ -77,7 +85,13 @@ public class RentalServiceImpl implements RentalService {
         LocalDateTime now = LocalDateTime.now();
         rental.setReturned(true);
         rental.setActualRentalEnd(now);
-
+        User user = rental.getUser();
+        Car car = rental.getCar();
+        notificationService.sendNotification(
+                user,
+                NotificationSubject.RENTAL_CONFIRMED.toString(),
+                "Your car " + car.getBrand() + " " + car.getModel() + " is returned."
+        );
         carService.returnRentedCar(rental.getCar().getId());
     }
 
@@ -90,9 +104,18 @@ public class RentalServiceImpl implements RentalService {
     @Override
     @Transactional(readOnly = true)
     public Page<RentalWithDetailedCarInfoDto> checkOverdueRentals(Pageable  pageable) {
-        LocalDate today = LocalDate.now();
-        return rentalRepository.findAllOverdues(today, pageable)
-                .map(rentalMapper::toWithDetailedCarInfoDto);
+        LocalDateTime today = LocalDateTime.now();
+        Page<Rental> allOverdues = rentalRepository.findAllOverdues(today, pageable);
+        allOverdues.stream().forEach(overdueRental -> {
+            Car car = overdueRental.getCar();
+            notificationService.sendNotification(
+                    overdueRental.getUser(),
+                    NotificationSubject.RENTAL_OVERDUE.toString(),
+                    "Your car booking " + car.getBrand() + " " + car.getModel() + " is overdue. Please return car"
+            );
+        });
+
+        return allOverdues.map(rentalMapper::toWithDetailedCarInfoDto);
     }
 
     @Override

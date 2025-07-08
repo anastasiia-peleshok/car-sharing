@@ -4,13 +4,11 @@ import com.example.carsharing.dto.payment.PaymentCreationRequestDto;
 import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.mapper.PaymentMapper;
-import com.example.carsharing.model.Payment;
-import com.example.carsharing.model.Rental;
-import com.example.carsharing.model.Status;
-import com.example.carsharing.model.User;
+import com.example.carsharing.model.*;
 import com.example.carsharing.repository.PaymentRepository;
 import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
+import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
     private final WayForPayService wayForPayService;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -106,6 +105,12 @@ public class PaymentServiceImpl implements PaymentService {
             if (paid) {
                 payment.setStatus(Status.PAID);
                 payment.setPaymentTime(LocalDateTime.now());
+                User user = payment.getUser();
+                notificationService.sendNotification(
+                        user,
+                        NotificationSubject.BOOKING_CONFIRMED.toString(),
+                        "Your payment for car rental is proceeded."
+                );
             }
         }
     }

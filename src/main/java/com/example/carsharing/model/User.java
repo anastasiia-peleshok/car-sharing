@@ -16,11 +16,11 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET is_deleted = TRUE WHERE id = ?")
+@SQLDelete(sql = "UPDATE users SET is_deleted = TRUE, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
 @ToString(exclude = "rentals")
-@EqualsAndHashCode(callSuper = true,exclude = "rentals")
+@EqualsAndHashCode(callSuper = true, exclude = "rentals")
 public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String firstName;

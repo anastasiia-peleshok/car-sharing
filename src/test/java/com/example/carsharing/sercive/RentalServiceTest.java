@@ -6,14 +6,17 @@ import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.exceptions.RentalIsNotActiveException;
 import com.example.carsharing.mapper.RentalMapper;
 import com.example.carsharing.model.Car;
+import com.example.carsharing.model.Notification;
 import com.example.carsharing.model.Rental;
 import com.example.carsharing.model.User;
 import com.example.carsharing.repository.CarRepository;
 import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.CarService;
+import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.impl.RentalServiceImpl;
 import com.example.carsharing.supplier.CarSupplier;
+import com.example.carsharing.supplier.NotificationSupplier;
 import com.example.carsharing.supplier.RentalSupplier;
 import com.example.carsharing.supplier.UserSupplier;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +48,8 @@ public class RentalServiceTest {
     @Mock
     private CarService carService;
     @Mock
+    private NotificationService notificationService;
+    @Mock
     private CarRepository carRepository;
     @InjectMocks
     private RentalServiceImpl rentalService;
@@ -59,6 +64,7 @@ public class RentalServiceTest {
         Rental rental = RentalSupplier.getRental();
         User user = UserSupplier.getUser();
         Car car = CarSupplier.getCar();
+        Notification notification = NotificationSupplier.getNotification();
 
         when(carRepository.findById(car.getId())).thenReturn(Optional.of(car));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));

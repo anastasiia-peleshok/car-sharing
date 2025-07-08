@@ -1,8 +1,6 @@
 package com.example.carsharing.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,16 +10,19 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Data
 @Entity
-@Table(name = "features")
-@SQLDelete(sql = "UPDATE featured SET is_deleted = TRUE, deleted_at = NOW() WHERE id = ?")
+@Table(name = "notifications")
+@SQLDelete(sql = "UPDATE notifications SET is_deleted = TRUE, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class Feature extends BaseEntity {
+public class Notification extends BaseEntity {
+    @Column(nullable = false)
+    String subject;
+    @Column(nullable = false)
+    String body;
 
-    @Column(nullable = false)
-    private String name;
-    @Column(nullable = false)
-    private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    User user;
 }

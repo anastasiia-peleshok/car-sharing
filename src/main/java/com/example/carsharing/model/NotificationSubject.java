@@ -1,0 +1,14 @@
+package com.example.carsharing.model;
+
+public enum NotificationSubject {
+    BOOKING_CONFIRMED,
+    BOOKING_CANCELLED,
+    BOOKING_REMINDER,
+    CAR_RETURN_REMINDER,
+    OVERDUE_RENTAL,
+    PAYMENT_RECEIVED,
+    PAYMENT_FAILED,
+    RENTAL_OVERDUE,
+    RENTAL_CONFIRMED,
+    USER_REGISTRATION
+}

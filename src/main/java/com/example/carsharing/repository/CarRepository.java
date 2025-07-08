@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CarRepository extends JpaRepository<Car, UUID>, JpaSpecificationExecutor<Car>, CustomCarRepository {
-
     @Query("SELECT DISTINCT c FROM Car c " +
             "LEFT JOIN FETCH c.features f " +
             "WHERE c.id = :id AND c.isDeleted = false " +
@@ -26,15 +25,5 @@ public interface CarRepository extends JpaRepository<Car, UUID>, JpaSpecificatio
     Optional<Car> findByIdWithRentals(@Param("id") UUID id);
 
     Page<Car> findAllByIsAvailable(Boolean isAvailable, Pageable pageable);
-
-
-    @Query("SELECT DISTINCT c FROM Car c " +
-            "LEFT JOIN FETCH c.features f " +
-            "LEFT JOIN FETCH c.rentals r " +
-            "WHERE c.id = :id AND c.isDeleted = false " +
-            "AND (f IS NULL OR f.isDeleted = false)" +
-            "AND (r IS NULL OR f.isDeleted = false)")
-    Optional<Car> findByIdWithAllRelations(@Param("id") UUID id);
-
 
 }

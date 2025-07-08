@@ -50,8 +50,7 @@ public class FeatureServiceImpl implements FeatureService {
 
     @Override
     public void deleteFeatureById(UUID id) {
-        Feature feature = getFeature(id);
-        featureRepository.delete(feature);
+        featureRepository.deleteById(id);
     }
 
     private Feature getFeature(UUID id) {

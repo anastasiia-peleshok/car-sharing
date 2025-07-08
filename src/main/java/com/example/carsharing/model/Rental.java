@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "rentals")
-@SQLDelete(sql = "UPDATE rentals SET is_deleted = TRUE WHERE id = ?")
+@SQLDelete(sql = "UPDATE rentals SET is_deleted = TRUE, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"user", "car", "payment"})
+@EqualsAndHashCode(callSuper = true, exclude = {"user", "car", "payment"})
 public class Rental extends BaseEntity {
     @Column(name = "is_returned", columnDefinition = "TINYINT(1)", nullable = false)
     private boolean isReturned;
@@ -29,7 +29,7 @@ public class Rental extends BaseEntity {
     @Column(name = "actual_rental_end", nullable = false)
     private LocalDateTime actualRentalEnd;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

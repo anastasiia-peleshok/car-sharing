@@ -14,25 +14,28 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "payments")
-@SQLDelete(sql = "UPDATE payments SET is_deleted = TRUE WHERE id = ?")
+@SQLDelete(sql = "UPDATE payments SET is_deleted = TRUE, deleted_at = NOW() WHERE id = ?")
 @SQLRestriction("is_deleted = FALSE")
 @NoArgsConstructor
-@ToString
-@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"rental", "user"})
+@EqualsAndHashCode(callSuper = true, exclude = {"rental", "user"})
 public class Payment extends BaseEntity {
 
     @Column(nullable = false)
     private BigDecimal amount;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
+
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(name = "rental_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;
 }

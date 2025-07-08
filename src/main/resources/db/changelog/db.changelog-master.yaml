@@ -31,3 +31,5 @@ databaseChangeLog:
       file: db/changelog/changes/015-create-car-feature-table.yaml
   - include:
       file: db/changelog/changes/016-fix-car-feature-table.yaml
+  - include:
+      file: db/changelog/changes/017-create-notifications-table.yaml

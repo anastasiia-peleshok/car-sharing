@@ -6,14 +6,17 @@ import com.example.carsharing.dto.user.UserUpdateRequestDto;
 import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.exceptions.RegistrationException;
 import com.example.carsharing.mapper.UserMapper;
+import com.example.carsharing.model.NotificationSubject;
 import com.example.carsharing.model.User;
 import com.example.carsharing.repository.UserRepository;
+import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -23,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -31,7 +35,10 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toModel(requestDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(User.Role.CUSTOMER);
-        return userMapper.toDto(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+        notificationService.sendNotification(savedUser, NotificationSubject.USER_REGISTRATION.toString(), "Dear "
+                + savedUser.getFirstName() + " " + savedUser.getLastName() + " you have successfully registered on CarSharing.com");
+        return userMapper.toDto(savedUser);
     }
 
     @Override
@@ -72,7 +79,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(UUID id) {
-        getUser(id);
         userRepository.deleteById(id);
     }
 
