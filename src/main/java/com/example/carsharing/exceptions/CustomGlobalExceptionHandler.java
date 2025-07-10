@@ -11,6 +11,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers,
@@ -27,7 +29,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     ) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", getStatus(ex));
+        body.put("status", status.value());
         body.put("errors",
                 ex.getBindingResult().getAllErrors().stream()
                         .map(this::getErrorMessage)
@@ -37,51 +39,55 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(body, headers, status);
     }
 
-    @ExceptionHandler(
-            {
-                    RegistrationException.class,
-                    EntityNotFoundException.class,
-                    JwtException.class
-            }
-    )
-    public ResponseEntity<Object> handleException(
-            RuntimeException exception
-    ) {
-        HttpStatus status = getStatus(exception);
+    @ExceptionHandler(RegistrationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> handleRegistrationException(RegistrationException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.CONFLICT, ex, request);
+    }
 
+    @ExceptionHandler(NoAvailableCarsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Object> handleNoAvailableCarsException(NoAvailableCarsException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(RentalIsNotActiveException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleRentalIsNotActiveException(RentalIsNotActiveException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.NOT_FOUND, ex, request);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Object> handleJwtException(JwtException ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.UNAUTHORIZED, ex, request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleOtherExceptions(Exception ex, WebRequest request) {
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, ex, request);
+    }
+
+    private ResponseEntity<Object> buildResponseEntity(HttpStatus status, Exception ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", status);
-        body.put("error", exception.getMessage());
-
+        body.put("status", status.value());
+        body.put("error", ex.getMessage());
+        body.put("path", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(status).body(body);
     }
 
     private String getErrorMessage(ObjectError error) {
-        if (error instanceof FieldError) {
-            String field = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            return field + " " + message;
+        if (error instanceof FieldError fieldError) {
+            return fieldError.getField() + " " + fieldError.getDefaultMessage();
         }
-
         return error.getDefaultMessage();
-    }
-
-    private HttpStatus getStatus(Exception exception) {
-        HttpStatus status = null;
-
-        if (exception instanceof RegistrationException) {
-            status = HttpStatus.CONFLICT;
-        } else if (exception instanceof EntityNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-        } else if (exception instanceof JwtException) {
-            status = HttpStatus.UNAUTHORIZED;
-        } else if (exception instanceof NoAvailableCarsException) {
-            status = HttpStatus.CONFLICT;
-        } else {
-            status = HttpStatus.BAD_REQUEST;
-        }
-
-        return status;
     }
 }

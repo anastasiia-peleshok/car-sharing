@@ -3,6 +3,7 @@ package com.example.carsharing.controller;
 import com.example.carsharing.dto.rental.RentalCreationRequestDto;
 import com.example.carsharing.dto.rental.RentalDto;
 import com.example.carsharing.dto.rental.RentalWithDetailedCarInfoDto;
+import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class RentalController {
      * Mark the rental as returned by updating the actual return date.
      */
     @Operation(summary = "Return rented car", description = "Mark the rental as returned by updating the actual return date")
-    @PostMapping("/return/{rentalId}")
+    @PostMapping("/complete/{rentalId}")
     @ResponseStatus(HttpStatus.OK)
     public void returnRental(@PathVariable UUID rentalId) {
         rentalService.completeRental(rentalId);
@@ -49,7 +50,7 @@ public class RentalController {
      * Get the cost of a rental (including penalty if overdue).
      */
     @Operation(summary = "Get cost of rental", description = "Get the cost of a rental (including penalty if overdue)")
-    @PostMapping("/cost/{rentalId}")
+    @PostMapping("/amount/{rentalId}")
     @ResponseStatus(HttpStatus.OK)
     public BigDecimal getRentalCost(@PathVariable UUID rentalId) {
         return rentalService.getAmountToPay(rentalId);

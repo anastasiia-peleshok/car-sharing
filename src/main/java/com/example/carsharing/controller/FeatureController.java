@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/features")
+@RequestMapping("/feature")
 @RequiredArgsConstructor
 public class FeatureController {
     private final FeatureService featureService;

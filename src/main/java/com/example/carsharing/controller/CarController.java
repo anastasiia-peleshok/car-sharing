@@ -30,6 +30,27 @@ public class CarController {
     }
 
     /**
+     * Get a specific car by its ID.
+     */
+    @Operation(summary = "Get car by ID", description = "Retrieve a specific car by its UUID")
+    @GetMapping("/{carId}")
+    public CarDto getCarById(@PathVariable UUID carId) {
+        return carService.getCarById(carId);
+    }
+
+    /**
+     * Register a new car in the system.
+     */
+    @Operation(summary = "Add car", description = "Add a new car to the system")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public CarDto addCar(@RequestBody CarRegistrationRequestDto requestDto) {
+        return carService.save(requestDto);
+    }
+
+
+    /**
      * Get all cars matching a list of filter criteria.
      */
     @Operation(summary = "Get cars by filter", description = "Retrieve all cars from database by filter criteria")
@@ -38,25 +59,6 @@ public class CarController {
         return carService.getCarsByFilter(filters, pageable);
     }
 
-    /**
-     * Add feature into car.
-     */
-    @Operation(summary = "Add feature to car", description = "Add")
-    @PostMapping("/{carId}/{featureId}")
-    @PreAuthorize("hasAuthority('MANAGER')")
-    public CarDto addFeatureToCar(@PathVariable UUID carId, @PathVariable UUID featureId ) {
-        return carService.setNewFeatureToCar(carId, featureId);
-
-    }
-
-    /**
-     * Get a specific car by its ID.
-     */
-    @Operation(summary = "Get car by ID", description = "Retrieve a specific car by its UUID")
-    @GetMapping("/{carId}")
-    public CarDto getCarById(@PathVariable UUID carId) {
-        return carService.getCarById(carId);
-    }
 
     /**
      * Get a specific car by its ID with features.
@@ -95,14 +97,14 @@ public class CarController {
     }
 
     /**
-     * Register a new car in the system.
+     * Add feature into car.
      */
-    @Operation(summary = "Add car", description = "Add a new car to the system")
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add feature to car", description = "Add")
+    @PostMapping("/{carId}/{featureId}")
     @PreAuthorize("hasAuthority('MANAGER')")
-    public CarDto addCar(@RequestBody CarRegistrationRequestDto requestDto) {
-        return carService.save(requestDto);
+    public CarDto addFeatureToCar(@PathVariable UUID carId, @PathVariable UUID featureId ) {
+        return carService.setNewFeatureToCar(carId, featureId);
+
     }
 
     /**

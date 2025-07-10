@@ -2,6 +2,8 @@ package com.example.carsharing.repository;
 
 import com.example.carsharing.model.Payment;
 import com.example.carsharing.model.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +18,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
             "AND p.isDeleted=false")
     List<Payment> findByStatus(@Param("status") Status status);
 
+
+    Page<Payment> findAllByStatus(Status status, Pageable pageable);
 }

@@ -1,6 +1,5 @@
 package com.example.carsharing.service.impl;
 
-import com.example.carsharing.dto.payment.PaymentCreationRequestDto;
 import com.example.carsharing.dto.payment.PaymentResponseDto;
 import com.example.carsharing.exceptions.EntityNotFoundException;
 import com.example.carsharing.mapper.PaymentMapper;
@@ -10,6 +9,7 @@ import com.example.carsharing.repository.RentalRepository;
 import com.example.carsharing.repository.UserRepository;
 import com.example.carsharing.service.NotificationService;
 import com.example.carsharing.service.PaymentService;
+import com.example.carsharing.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,23 +26,22 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final PaymentRepository paymentRepository;
-    private final UserRepository userRepository;
+    private final RentalService rentalService;
     private final RentalRepository rentalRepository;
     private final WayForPayService wayForPayService;
     private final NotificationService notificationService;
 
 
     @Override
-    public PaymentResponseDto createPayment(PaymentCreationRequestDto paymentRequestDto) {
-        Rental rental = rentalRepository.findById(paymentRequestDto.rentalId())
-                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + paymentRequestDto.rentalId()));
-
-        User user = userRepository.findById(paymentRequestDto.userId())
-                .orElseThrow(() -> new EntityNotFoundException("There is no user with id: " + paymentRequestDto.userId()));
-
-        Payment payment = paymentMapper.toModel(paymentRequestDto);
+    public PaymentResponseDto createPayment(UUID rentalId) {
+        Rental rental = rentalRepository.findById(rentalId)
+                .orElseThrow(() -> new EntityNotFoundException("There is no rental with id: " + rentalId));
+        User user = rental.getUser();
+        Payment payment = new Payment();
         payment.setUser(user);
         payment.setRental(rental);
+        payment.setAmount(rentalService.getAmountToPay(rentalId));
+        payment.setStatus(Status.UNPAID);
         Payment savedPayment = paymentRepository.save(payment);
 
         String paymentLink;
@@ -113,6 +112,12 @@ public class PaymentServiceImpl implements PaymentService {
                 );
             }
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PaymentResponseDto> getPaymentByStatus(Status status, Pageable pageable) {
+        return paymentRepository.findAllByStatus(status, pageable).map(paymentMapper::toDto);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.example.carsharing.controller;
 
-import com.example.carsharing.dto.payment.PaymentCreationRequestDto;
 import com.example.carsharing.dto.payment.PaymentResponseDto;
+import com.example.carsharing.model.Status;
 import com.example.carsharing.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/payment")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
@@ -22,10 +22,10 @@ public class PaymentController {
      * Create a new payment for a rental.
      */
     @Operation(summary = "Create payment", description = "Create a new payment for a specific rental and user.")
-    @PostMapping
+    @PostMapping("/{rentalId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public PaymentResponseDto createPayment(@RequestBody PaymentCreationRequestDto paymentRequestDto) {
-        return paymentService.createPayment(paymentRequestDto);
+    public PaymentResponseDto createPayment(@PathVariable UUID rentalId) {
+        return paymentService.createPayment(rentalId);
     }
 
     /**
@@ -47,4 +47,15 @@ public class PaymentController {
     public PaymentResponseDto getPaymentById(@PathVariable UUID id) {
         return paymentService.getPaymentById(id);
     }
+
+    /**
+     * Get payment details by ID.
+     */
+    @Operation(summary = "Get payment by ID", description = "Retrieve details of a specific payment by its ID.")
+    @GetMapping("/status/{status}")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<PaymentResponseDto> getPaymentByStatus(@PathVariable Status status, Pageable pageable) {
+        return paymentService.getPaymentByStatus(status, pageable);
+    }
+
 }
